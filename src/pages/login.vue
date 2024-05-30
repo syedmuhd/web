@@ -28,15 +28,15 @@ const router = useRouter()
 const ability = useAbility()
 
 const errors = ref({
-  email: undefined,
+  emailOrPhone: undefined,
   password: undefined,
 })
 
 const refVForm = ref()
 
 const credentials = ref({
-  email: 'admin@demo.com',
-  password: 'admin',
+  emailOrPhone: 'admin@softwarehub.my',
+  password: 'password',
 })
 
 const rememberMe = ref(false)
@@ -46,7 +46,7 @@ const login = async () => {
     const res = await $api('/auth/login', {
       method: 'POST',
       body: {
-        email: credentials.value.email,
+        emailOrPhone: credentials.value.emailOrPhone,
         password: credentials.value.password,
       },
       onResponseError({ response }) {
@@ -135,19 +135,6 @@ const onSubmit = () => {
           </p>
         </VCardText>
         <VCardText>
-          <VAlert
-            color="primary"
-            variant="tonal"
-          >
-            <p class="text-sm mb-2">
-              Admin Email: <strong>admin@demo.com</strong> / Pass: <strong>admin</strong>
-            </p>
-            <p class="text-sm mb-0">
-              Client Email: <strong>client@demo.com</strong> / Pass: <strong>client</strong>
-            </p>
-          </VAlert>
-        </VCardText>
-        <VCardText>
           <VForm
             ref="refVForm"
             @submit.prevent="onSubmit"
@@ -156,13 +143,13 @@ const onSubmit = () => {
               <!-- email -->
               <VCol cols="12">
                 <AppTextField
-                  v-model="credentials.email"
+                  v-model="credentials.emailOrPhone"
                   label="Email"
-                  placeholder="johndoe@email.com"
+                  placeholder="admin@softwarehub.my"
                   type="email"
                   autofocus
-                  :rules="[requiredValidator, emailValidator]"
-                  :error-messages="errors.email"
+                  :rules="[requiredValidator]"
+                  :error-messages="errors.emailOrPhone"
                 />
               </VCol>
 
