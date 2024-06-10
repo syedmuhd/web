@@ -50,7 +50,7 @@ const suggestionGroups = [
       {
         icon: 'tabler-lock',
         title: 'Roles & Permissions',
-        url: { name: 'apps-roles' },
+        url: { name: 'roles' },
       },
       {
         icon: 'tabler-settings',

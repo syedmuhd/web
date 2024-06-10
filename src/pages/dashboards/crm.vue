@@ -1,4 +1,5 @@
 <script setup>
+import { useBranchStore } from '@/composables/stores/useBranchStore'
 import CrmActiveProject from '@/views/dashboards/crm/CrmActiveProject.vue'
 import CrmActivityTimeline from '@/views/dashboards/crm/CrmActivityTimeline.vue'
 import CrmAnalyticsSales from '@/views/dashboards/crm/CrmAnalyticsSales.vue'
@@ -28,6 +29,8 @@ const simpleStatisticsDemoCards = [
     change: '+25.2%',
   },
 ]
+
+const branchStore = useBranchStore()
 </script>
 
 <template>
@@ -38,6 +41,7 @@ const simpleStatisticsDemoCards = [
       sm="6"
       lg="2"
     >
+    Hello {{ branchStore.getCurrentActiveBranchId }}
       <CrmOrderBarChart />
     </VCol>
 

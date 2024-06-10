@@ -1,5 +1,12 @@
 <script setup>
 import { VForm } from 'vuetify/components/VForm'
+import Permissions from '@/components/permissions/Permissions.vue'
+import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
+import { useMutation } from 'villus';
+import { useBranchStore } from '@/composables/stores/useBranchStore';
+
+const roleName = ref('')
+const branchStore = useBranchStore()
 
 const props = defineProps({
   rolePermissions: {
@@ -24,57 +31,11 @@ const emit = defineEmits([
 const permissions = ref([
   {
     name: 'User Management',
+    view: false,
     read: false,
     write: false,
     create: false,
-  },
-  {
-    name: 'Content Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Disputes Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Database Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Financial Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Reporting',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'API Control',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Repository Management',
-    read: false,
-    write: false,
-    create: false,
-  },
-  {
-    name: 'Payroll',
-    read: false,
-    write: false,
-    create: false,
+    delete: false,
   },
 ])
 
@@ -90,29 +51,39 @@ const checkedCount = computed(() => {
         counter++
     })
   })
-  
+
   return counter
 })
 
-const isIndeterminate = computed(() => checkedCount.value > 0 && checkedCount.value < permissions.value.length * 3)
+const isIndeterminate = computed(() => checkedCount.value > 0 && checkedCount.value < permissions.value.length * 5)
 
 watch(isSelectAll, val => {
   permissions.value = permissions.value.map(permission => ({
     ...permission,
+    view: val,
     read: val,
     write: val,
     create: val,
+    delete: val,
   }))
 })
+
 watch(isIndeterminate, () => {
   if (!isIndeterminate.value)
     isSelectAll.value = false
 })
+
 watch(permissions, () => {
-  if (checkedCount.value === permissions.value.length * 3)
+  if (checkedCount.value === permissions.value.length * 5)
     isSelectAll.value = true
 }, { deep: true })
-watch(props, () => {
+
+watch(props, async () => {
+
+  // if (props.isDialogVisible) {
+
+  // }
+
   if (props.rolePermissions && props.rolePermissions.permissions.length) {
     role.value = props.rolePermissions.name
     permissions.value = permissions.value.map(permission => {
@@ -123,20 +94,44 @@ watch(props, () => {
           ...rolePermission,
         }
       }
-      
+
       return permission
     })
   }
 })
 
 const onSubmit = () => {
-  const rolePermissions = {
-    name: role.value,
-    permissions: permissions.value,
-  }
+  const MUTATION_CREATE_ROLE_WITH_PERMISSIONS = `
+    mutation CreateRole ($roleName: String!, $branchId: Int!, $permissions: [CreatePermissionInput!]!) {
+      createRole(
+        input: {name: $roleName, branch_id: $branchId, permissions: {create: $permissions}}
+      ) {
+        id
+      }
+    }
+  `
+  const { data, execute } = useMutation(MUTATION_CREATE_ROLE_WITH_PERMISSIONS);
 
-  emit('update:rolePermissions', rolePermissions)
+  const variables = {
+    roleName: roleName.value,
+    branchId: branchStore.getCurrentActiveBranchId,
+    permissions: [
+      { name: 'Ina Go' },
+      { name: 'Ina Wow' }
+    ]
+  };
+
+  execute(variables)
+    .then(response => {
+      console.log('Role created with ID:', response.data.createRole.id);
+    })
+    .catch(error => {
+      console.error('Error creating role:', error);
+    });
+
   emit('update:isDialogVisible', false)
+
+  return false
   isSelectAll.value = false
   refPermissionForm.value?.reset()
 }
@@ -149,11 +144,8 @@ const onReset = () => {
 </script>
 
 <template>
-  <VDialog
-    :width="$vuetify.display.smAndDown ? 'auto' : 900"
-    :model-value="props.isDialogVisible"
-    @update:model-value="onReset"
-  >
+  <VDialog :width="$vuetify.display.smAndDown ? 'auto' : 900" :model-value="props.isDialogVisible"
+    @update:model-value="onReset">
     <!-- 👉 Dialog close btn -->
     <DialogCloseBtn @click="onReset" />
 
@@ -170,11 +162,7 @@ const onReset = () => {
         <!-- 👉 Form -->
         <VForm ref="refPermissionForm">
           <!-- 👉 Role name -->
-          <AppTextField
-            v-model="role"
-            label="Role Name"
-            placeholder="Enter Role Name"
-          />
+          <AppTextField v-model="roleName" label="Role Name" placeholder="Enter Role Name" />
 
           <h5 class="text-h5 my-6">
             Role Permissions
@@ -190,67 +178,31 @@ const onReset = () => {
                   Administrator Access
                 </h6>
               </td>
-              <td colspan="3">
+              <td colspan="5">
                 <div class="d-flex justify-end">
-                  <VCheckbox
-                    v-model="isSelectAll"
-                    v-model:indeterminate="isIndeterminate"
-                    label="Select All"
-                  />
+                  <VCheckbox v-model="isSelectAll" v-model:indeterminate="isIndeterminate" label="Select All" />
                 </div>
               </td>
             </tr>
 
-            <!-- 👉 Other permission loop -->
-            <template
-              v-for="permission in permissions"
-              :key="permission.name"
-            >
-              <tr>
-                <td>
-                  <h6 class="text-h6">
-                    {{ permission.name }}
-                  </h6>
-                </td>
-                <td>
-                  <div class="d-flex justify-end">
-                    <VCheckbox
-                      v-model="permission.read"
-                      label="Read"
-                    />
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex justify-end">
-                    <VCheckbox
-                      v-model="permission.write"
-                      label="Write"
-                    />
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex justify-end">
-                    <VCheckbox
-                      v-model="permission.create"
-                      label="Create"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </template>
+            <Suspense>
+              <template #default>
+                <Permissions />
+              </template>
+              <template #fallback>
+                <span>Loading...</span>
+              </template>
+            </Suspense>
+
           </VTable>
 
           <!-- 👉 Actions button -->
           <div class="d-flex align-center justify-center gap-4">
             <VBtn @click="onSubmit">
-              Submit
+              Save
             </VBtn>
 
-            <VBtn
-              color="secondary"
-              variant="tonal"
-              @click="onReset"
-            >
+            <VBtn color="secondary" variant="tonal" @click="onReset">
               Cancel
             </VBtn>
           </div>

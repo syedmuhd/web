@@ -22,7 +22,7 @@ const shortcuts = [
     icon: 'tabler-users',
     title: 'Role Management',
     subtitle: 'Permission',
-    to: { name: 'apps-roles' },
+    to: { name: 'roles' },
   },
   {
     icon: 'tabler-device-desktop-analytics',

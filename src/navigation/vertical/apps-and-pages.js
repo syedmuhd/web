@@ -98,7 +98,7 @@ export default [
     title: 'Roles & Permissions',
     icon: { icon: 'tabler-lock' },
     children: [
-      { title: 'Roles', to: 'apps-roles' },
+      { title: 'Roles', to: 'roles' },
       { title: 'Permissions', to: 'apps-permissions' },
     ],
   },

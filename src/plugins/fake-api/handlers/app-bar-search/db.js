@@ -337,7 +337,7 @@ export const db = {
           title: 'Wizard - Property Listing',
         },
         {
-          url: { name: 'apps-roles' },
+          url: { name: 'roles' },
           icon: 'tabler-shield-checkered',
           title: 'Roles',
         },

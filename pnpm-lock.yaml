@@ -70,6 +70,12 @@ importers:
       eslint-plugin-regexp:
         specifier: 2.2.0
         version: 2.2.0(eslint@8.57.0)
+      graphql:
+        specifier: ^16.8.1
+        version: 16.8.1
+      graphql-tag:
+        specifier: ^2.12.6
+        version: 2.12.6(graphql@16.8.1)
       jwt-decode:
         specifier: 4.0.0
         version: 4.0.0
@@ -100,6 +106,9 @@ importers:
       unplugin-vue-define-options:
         specifier: 1.4.2
         version: 1.4.2(rollup@4.12.0)(vue@3.4.21(typescript@5.3.3))
+      villus:
+        specifier: ^3.5.0
+        version: 3.5.0(graphql@16.8.1)(vue@3.4.21(typescript@5.3.3))
       vue:
         specifier: 3.4.21
         version: 3.4.21(typescript@5.3.3)
@@ -2465,6 +2474,12 @@ packages:
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
 
+  graphql-tag@2.12.6:
+    resolution: {integrity: sha512-FdSNcu2QQcWnM2VNvSCCDCVS5PpPqpzgFT8+GXzqJuoDd0CBncxCY278u4mhRO7tMgo2JjgJA5aZ+nWSQ/Z+xg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+
   graphql@16.8.1:
     resolution: {integrity: sha512-59LZHPdGZVh695Ud9lRzPBVTtlX9ZCV150Er2W43ro37wVof0ctenSaskPPjN7lVTIN8mSZt8PHUNKZuNQUuxw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
@@ -4167,6 +4182,12 @@ packages:
 
   videojs-vtt.js@0.15.5:
     resolution: {integrity: sha512-yZbBxvA7QMYn15Lr/ZfhhLPrNpI/RmCSCqgIff57GC2gIrV5YfyzLfLyZMj0NnZSAz8syB4N0nHXpZg9MyrMOQ==}
+
+  villus@3.5.0:
+    resolution: {integrity: sha512-6DJAPCAo/HHZ14Wd/NbtIWSDRe59L0lm8qGYzVgwIaCdZOGhCGgtzuolQsb0nWS8wx+IDDWbKkMgvqbJzeeVJA==}
+    peerDependencies:
+      graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+      vue: ^3.0.0 || ^2.7.0
 
   vite-hot-client@0.2.3:
     resolution: {integrity: sha512-rOGAV7rUlUHX89fP2p2v0A2WWvV3QMX2UYq0fRqsWSvFvev4atHWqjwGoKaZT1VTKyLGk533ecu3eyd0o59CAg==}
@@ -7047,6 +7068,11 @@ snapshots:
 
   graphemer@1.4.0: {}
 
+  graphql-tag@2.12.6(graphql@16.8.1):
+    dependencies:
+      graphql: 16.8.1
+      tslib: 2.6.2
+
   graphql@16.8.1: {}
 
   grid-index@1.1.0: {}
@@ -8837,6 +8863,11 @@ snapshots:
   videojs-vtt.js@0.15.5:
     dependencies:
       global: 4.4.0
+
+  villus@3.5.0(graphql@16.8.1)(vue@3.4.21(typescript@5.3.3)):
+    dependencies:
+      graphql: 16.8.1
+      vue: 3.4.21(typescript@5.3.3)
 
   vite-hot-client@0.2.3(vite@5.1.4(@types/node@20.11.24)(sass@1.71.1)):
     dependencies:
