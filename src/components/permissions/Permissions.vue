@@ -1,9 +1,14 @@
 <script setup>
+import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
 import gql from 'graphql-tag'
 import { useQuery } from 'villus'
 import { ref } from 'vue'
 
-const rolePermissions = ref([])
+/**
+ * Stores
+ */
+const rolePermissionStore = useRolePermissionStore()
+
 const modules = ref([])
 const permissions = [
   'View',
@@ -26,8 +31,6 @@ await useQuery({
   modules.value = data.value.modules
 })
 
-watch(rolePermissions, () => console.log(rolePermissions.value))
-
 </script>
 
 <template>
@@ -39,7 +42,8 @@ watch(rolePermissions, () => console.log(rolePermissions.value))
     </td>
     <td v-for="permission in permissions" :key="permission.id">
       <div class="d-flex justify-end">
-        <VCheckbox :label="permission" :value="permission + ' ' + module.name" v-model="rolePermissions" />
+        <VCheckbox :label="permission" :value="{ name: permission + ' ' + module.name }"
+          v-model="rolePermissionStore.rolePermissions.permissions" />
       </div>
     </td>
   </tr>

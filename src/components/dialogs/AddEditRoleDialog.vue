@@ -1,25 +1,26 @@
 <script setup>
 import { VForm } from 'vuetify/components/VForm'
 import Permissions from '@/components/permissions/Permissions.vue'
-import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
 import { useMutation } from 'villus';
 import { useBranchStore } from '@/composables/stores/useBranchStore';
+import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
 
-const roleName = ref('')
+const permissions = ref([])
+
+/**
+ * Stores
+ */
 const branchStore = useBranchStore()
+const rolePermissionStore = useRolePermissionStore()
 
 const props = defineProps({
-  rolePermissions: {
-    type: Object,
-    required: false,
-    default: () => ({
-      name: '',
-      permissions: [],
-    }),
-  },
   isDialogVisible: {
     type: Boolean,
     required: true,
+  },
+  rolePermissions: {
+    type: Object,
+    required: false,
   },
 })
 
@@ -28,106 +29,16 @@ const emit = defineEmits([
   'update:rolePermissions',
 ])
 
-const permissions = ref([
-  {
-    name: 'User Management',
-    view: false,
-    read: false,
-    write: false,
-    create: false,
-    delete: false,
-  },
-])
 
 const isSelectAll = ref(false)
-const role = ref('')
 const refPermissionForm = ref()
 
-const checkedCount = computed(() => {
-  let counter = 0
-  permissions.value.forEach(permission => {
-    Object.entries(permission).forEach(([key, value]) => {
-      if (key !== 'name' && value)
-        counter++
-    })
-  })
-
-  return counter
-})
-
-const isIndeterminate = computed(() => checkedCount.value > 0 && checkedCount.value < permissions.value.length * 5)
-
-watch(isSelectAll, val => {
-  permissions.value = permissions.value.map(permission => ({
-    ...permission,
-    view: val,
-    read: val,
-    write: val,
-    create: val,
-    delete: val,
-  }))
-})
-
-watch(isIndeterminate, () => {
-  if (!isIndeterminate.value)
-    isSelectAll.value = false
-})
-
-watch(permissions, () => {
-  if (checkedCount.value === permissions.value.length * 5)
-    isSelectAll.value = true
-}, { deep: true })
-
-watch(props, async () => {
-
-  // if (props.isDialogVisible) {
-
-  // }
-
-  if (props.rolePermissions && props.rolePermissions.permissions.length) {
-    role.value = props.rolePermissions.name
-    permissions.value = permissions.value.map(permission => {
-      const rolePermission = props.rolePermissions?.permissions.find(item => item.name === permission.name)
-      if (rolePermission) {
-        return {
-          ...permission,
-          ...rolePermission,
-        }
-      }
-
-      return permission
-    })
-  }
+watch(props, () => {
+  console.log(props.rolePermissions)
 })
 
 const onSubmit = () => {
-  const MUTATION_CREATE_ROLE_WITH_PERMISSIONS = `
-    mutation CreateRole ($roleName: String!, $branchId: Int!, $permissions: [CreatePermissionInput!]!) {
-      createRole(
-        input: {name: $roleName, branch_id: $branchId, permissions: {create: $permissions}}
-      ) {
-        id
-      }
-    }
-  `
-  const { data, execute } = useMutation(MUTATION_CREATE_ROLE_WITH_PERMISSIONS);
-
-  const variables = {
-    roleName: roleName.value,
-    branchId: branchStore.getCurrentActiveBranchId,
-    permissions: [
-      { name: 'Ina Go' },
-      { name: 'Ina Wow' }
-    ]
-  };
-
-  execute(variables)
-    .then(response => {
-      console.log('Role created with ID:', response.data.createRole.id);
-    })
-    .catch(error => {
-      console.error('Error creating role:', error);
-    });
+  rolePermissionStore.createRole()
 
   emit('update:isDialogVisible', false)
 
@@ -153,7 +64,7 @@ const onReset = () => {
       <VCardText>
         <!-- 👉 Title -->
         <h4 class="text-h4 text-center mb-2">
-          {{ props.rolePermissions.name ? 'Edit' : 'Add New' }} Role
+          Add Role
         </h4>
         <p class="text-body-1 text-center mb-6">
           Set Role Permissions
@@ -162,7 +73,8 @@ const onReset = () => {
         <!-- 👉 Form -->
         <VForm ref="refPermissionForm">
           <!-- 👉 Role name -->
-          <AppTextField v-model="roleName" label="Role Name" placeholder="Enter Role Name" />
+          <AppTextField v-model="rolePermissionStore.rolePermissions.roleName" label="Role Name"
+            placeholder="Enter Role Name" />
 
           <h5 class="text-h5 my-6">
             Role Permissions
@@ -171,19 +83,6 @@ const onReset = () => {
           <!-- 👉 Role Permissions -->
 
           <VTable class="permission-table text-no-wrap mb-6">
-            <!-- 👉 Admin  -->
-            <tr>
-              <td>
-                <h6 class="text-h6">
-                  Administrator Access
-                </h6>
-              </td>
-              <td colspan="5">
-                <div class="d-flex justify-end">
-                  <VCheckbox v-model="isSelectAll" v-model:indeterminate="isIndeterminate" label="Select All" />
-                </div>
-              </td>
-            </tr>
 
             <Suspense>
               <template #default>

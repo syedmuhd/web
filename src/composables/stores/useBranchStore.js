@@ -10,7 +10,7 @@ export const useBranchStore = defineStore("branch", {
             return state.branches
         },
         getCurrentActiveBranchId(state) {
-            return state.currentActiveBranchId
+            return parseInt(state.currentActiveBranchId)
         }
     },
     actions: {
