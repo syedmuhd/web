@@ -1,6 +1,6 @@
 <script setup>
-import { useModuleStore } from '@/composables/stores/useModuleStore';
-import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
+import { useModuleStore } from '@/stores/useModuleStore';
+import { useRolePermissionStore } from '@/stores/useRolePermissionStore';
 import { onMounted, ref } from 'vue'
 
 /**

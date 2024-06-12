@@ -1,5 +1,5 @@
 <script setup>
-import { useDialogStore } from '@/composables/stores/useDialogStore';
+import { useDialogStore } from '@/stores/useDialogStore';
 
 const dialogStore = useDialogStore()
 </script>

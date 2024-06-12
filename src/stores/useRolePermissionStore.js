@@ -36,11 +36,7 @@ export const useRolePermissionStore = defineStore("rolePermission", {
                 variables: { id: parseInt(branchStore.currentActiveBranchId) }
             });
 
-            execute()
-                .then(response => this.roles = response.data.rolesByBranch)
-                .catch(error => {
-                    console.error('Error deleting role:', error);
-                })
+            return execute()
         },
         createRole() {
             const variables = {

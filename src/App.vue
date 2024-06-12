@@ -7,7 +7,7 @@ import {
   useConfigStore,
 } from '@core/stores/config'
 import { hexToRgb } from '@layouts/utils'
-import { useAlertStore } from './composables/stores/useAlertStore'
+import { useAlertStore } from './stores/useAlertStore'
 import PromptDialog from './components/dialogs/PromptDialog.vue'
 
 const { global } = useTheme()

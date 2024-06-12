@@ -11,8 +11,8 @@ import authV2MaskDark from '@images/pages/misc-mask-dark.png'
 import authV2MaskLight from '@images/pages/misc-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
-import { useAuthStore } from '@/composables/stores/useAuthStore'
-import { useBranchStore } from '@/composables/stores/useBranchStore'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useBranchStore } from '@/stores/useBranchStore'
 
 const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)

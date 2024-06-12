@@ -4,16 +4,16 @@ import avatar2 from "@images/avatars/avatar-2.png";
 import avatar3 from "@images/avatars/avatar-3.png";
 import avatar4 from "@images/avatars/avatar-4.png";
 import girlUsingMobile from "@images/pages/girl-using-mobile.png";
-import { useRolePermissionStore } from "@/composables/stores/useRolePermissionStore";
+import { useRolePermissionStore } from "@/stores/useRolePermissionStore";
 import { onMounted } from "vue";
-import { useAlertStore } from "@/composables/stores/useAlertStore";
-import { useDialogStore } from "@/composables/stores/useDialogStore";
+import { useAlertStore } from "@/stores/useAlertStore";
+import { useDialogStore } from "@/stores/useDialogStore";
 
 /**
  * Lifecycle
  */
 onMounted(() => {
-  rolePermissionStore.getRoles()
+  rolePermissionStore.getRoles().then(response => rolePermissionStore.roles = response.data.rolesByBranch)
 })
 
 /**
@@ -53,7 +53,7 @@ const clickDeleteRole = (roleId) => {
   const deleteRoleCallback = () => {
     rolePermissionStore.deleteRole(roleId)
       .then(({ data }) => {
-        rolePermissionStore.getRoles()
+        rolePermissionStore.getRoles().then(response => rolePermissionStore.roles = response.data.rolesByBranch)
         alertStore.showAlert("Role successfully deleted")
         console.log('Role deleted with ID:', data.deleteRole.id);
       })

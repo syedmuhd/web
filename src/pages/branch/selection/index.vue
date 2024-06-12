@@ -1,5 +1,5 @@
 <script setup>
-import { useBranchStore } from '@/composables/stores/useBranchStore';
+import { useBranchStore } from '@/stores/useBranchStore';
 import congoImg from '@images/illustrations/congo-illustration.png'
 import { useRouter } from 'vue-router';
 

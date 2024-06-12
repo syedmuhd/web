@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/composables/stores/useAuthStore"
+import { useAuthStore } from "@/stores/useAuthStore"
 import { createClient, defaultPlugins } from "villus"
 import { router } from '@/plugins/1.router'
 

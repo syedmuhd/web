@@ -1,9 +1,9 @@
 <script setup>
 import { VForm } from 'vuetify/components/VForm'
 import Permissions from '@/components/permissions/Permissions.vue'
-import { useBranchStore } from '@/composables/stores/useBranchStore';
-import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
-import { useAlertStore } from '@/composables/stores/useAlertStore';
+import { useBranchStore } from '@/stores/useBranchStore';
+import { useRolePermissionStore } from '@/stores/useRolePermissionStore';
+import { useAlertStore } from '@/stores/useAlertStore';
 
 const permissions = ref([])
 
@@ -36,7 +36,7 @@ const onSubmit = () => {
   // create new
   if (!rolePermissionStore.isEditing) {
     rolePermissionStore.createRole().then(response => {
-      rolePermissionStore.getRoles()
+      rolePermissionStore.getRoles().then(response => rolePermissionStore.roles = response.data.rolesByBranch)
       alertStore.showAlert("New role successfully created")
     }).catch(error => {
       console.error('Error creating role:', error);
@@ -45,7 +45,7 @@ const onSubmit = () => {
     })
   } else { // update existing
     rolePermissionStore.updateRole(rolePermissionStore.editId).then(response => {
-      rolePermissionStore.getRoles()
+      rolePermissionStore.getRoles().then(response => rolePermissionStore.roles = response.data.rolesByBranch)
       alertStore.showAlert("Role successfully updated")
     }).catch(error => {
       console.error('Error creating role:', error);
