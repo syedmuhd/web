@@ -4,11 +4,10 @@ import avatar2 from "@images/avatars/avatar-2.png";
 import avatar3 from "@images/avatars/avatar-3.png";
 import avatar4 from "@images/avatars/avatar-4.png";
 import girlUsingMobile from "@images/pages/girl-using-mobile.png";
-import { useAuthStore } from "@/composables/stores/useAuthStore";
-import { useQuery } from "villus";
-import { useBranchStore } from "@/composables/stores/useBranchStore";
 import { useRolePermissionStore } from "@/composables/stores/useRolePermissionStore";
 import { onMounted } from "vue";
+import { useAlertStore } from "@/composables/stores/useAlertStore";
+import { useDialogStore } from "@/composables/stores/useDialogStore";
 
 /**
  * Lifecycle
@@ -21,6 +20,8 @@ onMounted(() => {
  * Stores
  */
 const rolePermissionStore = useRolePermissionStore()
+const alertStore = useAlertStore()
+const dialogStore = useDialogStore()
 
 /**
  * Local
@@ -29,18 +30,39 @@ const isRoleDialogVisible = ref(false)
 const isAddRoleDialogVisible = ref(false)
 
 const clickAddNewRole = () => {
+  rolePermissionStore.reset()
   isAddRoleDialogVisible.value = true
-};
+}
 
-const deleteRole = (roleId) => {
-  rolePermissionStore.deleteRole(roleId)
-    .then(response => {
-      rolePermissionStore.getRoles()
-      console.log('Role deleted with ID:', response.data.deleteRole.id);
-    })
-    .catch(error => {
-      console.error('Error deleting role:', error);
-    })
+const clickEditRole = (roleId) => {
+  rolePermissionStore.isEditing = true
+  rolePermissionStore.editId = roleId
+
+  rolePermissionStore.editRole(roleId).then(({ data }) => {
+    rolePermissionStore.rolePermissions.roleName = data.roleById.name
+    rolePermissionStore.rolePermissions.permissions = data.roleById.permissions.map(permission => permission.id)
+    isAddRoleDialogVisible.value = true
+  }).catch(error => {
+
+  })
+}
+
+const clickDeleteRole = (roleId) => {
+  dialogStore.isVisible = true
+
+  const deleteRoleCallback = () => {
+    rolePermissionStore.deleteRole(roleId)
+      .then(({ data }) => {
+        rolePermissionStore.getRoles()
+        alertStore.showAlert("Role successfully deleted")
+        console.log('Role deleted with ID:', data.deleteRole.id);
+      })
+      .catch(error => {
+        console.error('Error deleting role:', error);
+      })
+  }
+
+  dialogStore.showDialog("Are you sure you want to delete this role?", deleteRoleCallback);
 }
 </script>
 
@@ -65,7 +87,13 @@ const deleteRole = (roleId) => {
                 <VIcon icon="tabler-dots-vertical" />
                 <VMenu activator="parent">
                   <VList>
-                    <VListItem @click="deleteRole(role.id)">
+                    <VListItem @click="clickEditRole(role.id)">
+                      <template #prepend>
+                        <VIcon icon="tabler-edit" />
+                      </template>
+                      <VListItemTitle>Edit</VListItemTitle>
+                    </VListItem>
+                    <VListItem @click="clickDeleteRole(role.id)">
                       <template #prepend>
                         <VIcon icon="tabler-trash" />
                       </template>

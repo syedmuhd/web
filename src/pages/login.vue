@@ -45,6 +45,9 @@ const rememberMe = ref(false)
 
 const login = async () => {
   try {
+    // reset ability
+    ability.update([])
+
     const res = await $api('/auth/login', {
       method: 'POST',
       body: {

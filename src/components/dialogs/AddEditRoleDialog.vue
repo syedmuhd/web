@@ -1,9 +1,9 @@
 <script setup>
 import { VForm } from 'vuetify/components/VForm'
 import Permissions from '@/components/permissions/Permissions.vue'
-import { useMutation } from 'villus';
 import { useBranchStore } from '@/composables/stores/useBranchStore';
 import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
+import { useAlertStore } from '@/composables/stores/useAlertStore';
 
 const permissions = ref([])
 
@@ -12,6 +12,7 @@ const permissions = ref([])
  */
 const branchStore = useBranchStore()
 const rolePermissionStore = useRolePermissionStore()
+const alertStore = useAlertStore()
 
 const props = defineProps({
   isDialogVisible: {
@@ -26,21 +27,33 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:isDialogVisible',
-  'update:rolePermissions',
 ])
-
 
 const isSelectAll = ref(false)
 const refPermissionForm = ref()
 
-watch(props, () => {
-  console.log(props.rolePermissions)
-})
-
 const onSubmit = () => {
-  rolePermissionStore.createRole()
+  // create new
+  if (!rolePermissionStore.isEditing) {
+    rolePermissionStore.createRole().then(response => {
+      rolePermissionStore.getRoles()
+      alertStore.showAlert("New role successfully created")
+    }).catch(error => {
+      console.error('Error creating role:', error);
+    }).finally(() => {
+      emit('update:isDialogVisible', false)
+    })
+  } else { // update existing
+    rolePermissionStore.updateRole(rolePermissionStore.editId).then(response => {
+      rolePermissionStore.getRoles()
+      alertStore.showAlert("Role successfully updated")
+    }).catch(error => {
+      console.error('Error creating role:', error);
+    }).finally(() => {
+      emit('update:isDialogVisible', false)
+    })
+  }
 
-  emit('update:isDialogVisible', false)
 
   return false
   isSelectAll.value = false
@@ -64,7 +77,7 @@ const onReset = () => {
       <VCardText>
         <!-- 👉 Title -->
         <h4 class="text-h4 text-center mb-2">
-          Add Role
+          {{ !rolePermissionStore.isEditing ? "Add" : "Update" }} Role
         </h4>
         <p class="text-body-1 text-center mb-6">
           Set Role Permissions
@@ -98,7 +111,7 @@ const onReset = () => {
           <!-- 👉 Actions button -->
           <div class="d-flex align-center justify-center gap-4">
             <VBtn @click="onSubmit">
-              Save
+              {{ !rolePermissionStore.isEditing ? "Save" : "Update" }}
             </VBtn>
 
             <VBtn color="secondary" variant="tonal" @click="onReset">

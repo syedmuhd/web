@@ -1,49 +1,31 @@
 <script setup>
+import { useModuleStore } from '@/composables/stores/useModuleStore';
 import { useRolePermissionStore } from '@/composables/stores/useRolePermissionStore';
-import gql from 'graphql-tag'
-import { useQuery } from 'villus'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 /**
  * Stores
  */
+const moduleStore = useModuleStore()
 const rolePermissionStore = useRolePermissionStore()
 
-const modules = ref([])
-const permissions = [
-  'View',
-  'Edit',
-  'Create',
-  'Delete'
-]
-
-const GetModules = gql`
-    {
-      modules {
-        id
-        name
-      }
-    }
-  `
-await useQuery({
-  query: GetModules,
-}).then(({ data }) => {
-  modules.value = data.value.modules
+onMounted(() => {
+  moduleStore.getModulesWithPermissions()
 })
 
 </script>
 
 <template>
-  <tr v-for="module in modules" :key="module.id">
+  <tr v-for="module in moduleStore.modules" :key="module.id">
     <td>
       <h6 class="text-h6">
         {{ module.name }}
       </h6>
     </td>
-    <td v-for="permission in permissions" :key="permission.id">
+    <td v-for="permission in module.permissions" :key="permission.id">
       <div class="d-flex justify-end">
-        <VCheckbox :label="permission" :value="{ name: permission + ' ' + module.name }"
-          v-model="rolePermissionStore.rolePermissions.permissions" />
+        <VCheckbox v-model="rolePermissionStore.rolePermissions.permissions"
+          :label="permission.name.replace(module.name, '')" :value="permission.id" />
       </div>
     </td>
   </tr>
