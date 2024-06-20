@@ -1,15 +1,54 @@
 <script setup>
+import { useAlertStore } from '@/stores/useAlertStore';
+import { useBranchStore } from '@/stores/useBranchStore';
+import { useDialogStore } from '@/stores/useDialogStore';
+import { useRolePermissionStore } from '@/stores/useRolePermissionStore';
 import { useUserStore } from '@/stores/useUserStore';
-import AddNewUserDrawer from '@/views/apps/user/list/AddNewUserDrawer.vue'
 import { useRouter } from 'vue-router';
 
 const userStore = useUserStore()
+const rolePermissionStore = useRolePermissionStore()
+const dialogStore = useDialogStore()
+const alertStore = useAlertStore()
+
+/**
+ * Local
+ */
+const roles = ref([])
+const filterByRoleId = ref(null)
+
+watch(filterByRoleId, (roleId) => {
+    var variables
+
+    if (roleId) {
+        variables = {
+            branchCondition: {
+                value: parseInt(useBranchStore().currentActiveBranchId)
+            },
+            roleId: roleId
+        }
+    } else {
+        variables = {
+            branchCondition: {
+                value: parseInt(useBranchStore().currentActiveBranchId)
+            }
+        }
+    }
+    userStore.getAllUsers(variables)
+})
 
 /**
  * Lifecycle
  */
 onMounted(() => {
-    userStore.getAllUsers()
+    userStore.getAllUsers({
+        branchCondition: {
+            value: useBranchStore().currentActiveBranchId
+        }
+    })
+    rolePermissionStore.getRoles().then(({ data }) => {
+        roles.value = data.rolesByBranch
+    })
 })
 
 // 👉 Store
@@ -37,6 +76,10 @@ const headers = [
         key: 'role',
     },
     {
+        title: 'Joined Date',
+        key: 'joined-date',
+    },
+    {
         title: 'Actions',
         key: 'actions',
         sortable: false,
@@ -44,7 +87,6 @@ const headers = [
 ]
 
 const users = computed(() => userStore.users)
-const totalUsers = computed(() => users.length)
 
 const router = useRouter()
 const clickAddNewUser = () => {
@@ -58,8 +100,18 @@ const clickEditUser = (userId) => {
     router.replace('users/add')
 }
 
-const deleteUser = (userId) => {
+const clickDeleteUser = (userId) => {
+    const deleteUserCallback = () => {
+        userStore.deleteUser(userId)
+            .then(response => {
+                alertStore.showAlert("User successfully deleted")
+            })
+            .catch(error => {
+                console.error('Error', error);
+            })
+    }
 
+    dialogStore.showDialog("Are you sure you want to delete this user?", deleteUserCallback);
 }
 </script>
 
@@ -74,7 +126,8 @@ const deleteUser = (userId) => {
                 <VRow>
                     <!-- 👉 Select Role -->
                     <VCol cols="12" sm="4">
-                        <AppSelect placeholder="Select Role" :items="roles" clearable clear-icon="tabler-x" />
+                        <AppSelect item-title="name" v-model="filterByRoleId" item-value="id" placeholder="Select Role"
+                            :items="roles" clearable clear-icon="tabler-x" />
                     </VCol>
                 </VRow>
             </VCardText>
@@ -143,6 +196,15 @@ const deleteUser = (userId) => {
                     </div>
                 </template>
 
+                <!-- 👉 Joined Date -->
+                <template #item.joined-date="{ item }">
+                    <div class="d-flex align-center gap-x-2">
+                        <div class="text-capitalize text-high-emphasis text-body-1">
+                            {{ item.role.name }}
+                        </div>
+                    </div>
+                </template>
+
                 <!-- Actions -->
                 <template #item.actions="{ item }">
                     <IconBtn @click="deleteUser(item.id)">
@@ -172,7 +234,7 @@ const deleteUser = (userId) => {
                                     <VListItemTitle>Edit</VListItemTitle>
                                 </VListItem>
 
-                                <VListItem @click="deleteUser(item.id)">
+                                <VListItem @click="clickDeleteUser(item.id)">
                                     <template #prepend>
                                         <VIcon icon="tabler-trash" />
                                     </template>
@@ -185,7 +247,8 @@ const deleteUser = (userId) => {
 
                 <!-- pagination -->
                 <template #bottom>
-                    <TablePagination v-model:page="page" :items-per-page="itemsPerPage" :total-items="totalUsers" />
+                    <TablePagination v-model:page="page" :items-per-page="itemsPerPage"
+                        :total-items="userStore.users.length" />
                 </template>
             </VDataTableServer>
             <!-- SECTION -->

@@ -21,12 +21,21 @@ onMounted(() => {
 })
 
 const clickSubmit = () => {
-    userStore.createUser().then(response => {
-        alertStore.showAlert("User successfully created")
-        userStore.reset()
-        router.replace('/users')
-    }).catch(error => {
-    })
+    if (!userStore.isEditing) {
+        userStore.createUser().then(response => {
+            alertStore.showAlert("User successfully created")
+            userStore.reset()
+            router.replace('/users')
+        }).catch(error => {
+        })
+    } else {
+        userStore.updateUser().then(response => {
+            alertStore.showAlert("User successfully updated")
+            userStore.reset()
+            router.replace('/users')
+        }).catch(error => {
+        })
+    }
 }
 
 const formTitle = !userStore.isEditing ? 'Add New User' : 'Edit User'

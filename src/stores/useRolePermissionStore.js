@@ -65,7 +65,6 @@ export const useRolePermissionStore = defineStore("rolePermission", {
                 permissions: this.rolePermissions.permissions
             };
 
-
             const { execute } = useMutation(MUTATION_UPDATE_ROLE);
 
             return execute(variables)

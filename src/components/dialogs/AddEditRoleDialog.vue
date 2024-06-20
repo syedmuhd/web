@@ -5,12 +5,9 @@ import { useBranchStore } from '@/stores/useBranchStore';
 import { useRolePermissionStore } from '@/stores/useRolePermissionStore';
 import { useAlertStore } from '@/stores/useAlertStore';
 
-const permissions = ref([])
-
 /**
  * Stores
  */
-const branchStore = useBranchStore()
 const rolePermissionStore = useRolePermissionStore()
 const alertStore = useAlertStore()
 
